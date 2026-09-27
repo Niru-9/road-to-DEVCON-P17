@@ -1,0 +1,18 @@
+# Secret material. Never tracked.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+
+# The purse's book. Each run gets its own; the shipped sample lives in record/.
+data/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+node_modules/
+dist/
+*.tsbuildinfo

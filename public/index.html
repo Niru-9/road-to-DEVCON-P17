@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Khata — a spending purse you can read</title>
+    <meta
+      name="description"
+      content="An audit view of an agent that spends a fixed budget. Local stub settlement only: no real money moves."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!--
+      The banner is the first thing on the page and the first thing in the
+      accessibility tree. It exists because the most likely misreading of this UI
+      is that money moved, and that has to be corrected before any number is read.
+    -->
+    <div class="stub-banner" role="note" aria-label="Settlement mode">
+      <strong>Local stub settlement.</strong>
+      <span
+        >No chain is touched and no real funds move. The signer and facilitator are
+        stubs, so every result below is a policy and protocol decision — never a
+        payment.</span
+      >
+    </div>
+
+    <header class="page-head">
+      <h1>Khata</h1>
+      <p class="tagline">A purse with a fixed budget, and a record you can check.</p>
+    </header>
+
+    <main id="main">
+      <!-- ------------------------------------------------------------- -->
+      <section class="panel" aria-labelledby="h-question">
+        <h2 id="h-question">The question</h2>
+        <p id="question" class="question">Loading…</p>
+      </section>
+
+      <!-- ------------------------------------------------------------- -->
+      <!--
+        Policy is displayed, never edited. There is deliberately no form,
+        no input and no button in this section: the numbers came from the
+        environment and were frozen before the agent existed.
+      -->
+      <section class="panel" aria-labelledby="h-policy">
+        <h2 id="h-policy">Spending policy</h2>
+        <p class="hint">
+          Fixed at startup and read-only. No control on this page — and no API
+          endpoint — can raise a limit, widen an allowlist or add a host.
+        </p>
+        <dl class="policy-grid" id="policy">
+          <div>
+            <dt>Per-call ceiling</dt>
+            <dd id="p-ceiling">—</dd>
+          </div>
+          <div>
+            <dt>Run budget</dt>
+            <dd id="p-budget">—</dd>
+          </div>
+          <div>
+            <dt>Networks</dt>
+            <dd id="p-networks">—</dd>
+          </div>
+          <div>
+            <dt>Schemes</dt>
+            <dd id="p-schemes">—</dd>
+          </div>
+          <div>
+            <dt>Seller hosts</dt>
+            <dd id="p-hosts">—</dd>
+          </div>
+          <div>
+            <dt>Ledger</dt>
+            <dd id="p-ledger">—</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- ------------------------------------------------------------- -->
+      <section class="panel" aria-labelledby="h-run">
+        <h2 id="h-run">Run</h2>
+
+        <p class="provenance">
+          <span class="label-text">Planner</span>
+          <span id="r-planner" class="mono">—</span>
+        </p>
+
+        <!--
+          The only control on the page. It starts a run; it cannot change a limit.
+        -->
+        <button id="run" type="button" class="run-button">Run the demo</button>
+
+        <p id="status" class="status" role="status" aria-live="polite">Not started.</p>
+
+        <!--
+          The budget bar. role=progressbar with real values, because a coloured
+          bar alone tells a screen-reader user nothing.
+        -->
+        <div class="budget">
+          <div class="budget-head">
+            <span class="label-text">Committed</span>
+            <span id="b-text" class="mono">$0.00 of —</span>
+          </div>
+          <div
+            id="b-bar"
+            class="budget-bar"
+            role="progressbar"
+            aria-labelledby="b-text"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+            aria-valuetext="Nothing committed yet"
+          >
+            <div id="b-fill" class="budget-fill"></div>
+          </div>
+          <ul id="b-holds" class="holds" aria-label="Held amounts"></ul>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------- -->
+      <section class="panel" aria-labelledby="h-calls">
+        <h2 id="h-calls">Tool calls</h2>
+        <p class="hint">
+          Every call the model made, in order, with the rule that decided it. A
+          refusal here is the feature working.
+        </p>
+
+        <div class="table-scroll">
+          <table id="calls">
+            <caption class="visually-hidden">
+              Tool calls in order, with settlement status, price and refusal reason
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Label</th>
+                <th scope="col">Settlement</th>
+                <th scope="col">Quoted</th>
+                <th scope="col">Committed</th>
+                <th scope="col">Reason</th>
+              </tr>
+            </thead>
+            <tbody id="calls-body">
+              <tr class="empty">
+                <td colspan="6">No calls yet. Run the demo to see a real run.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------- -->
+      <section class="panel" aria-labelledby="h-audit">
+        <h2 id="h-audit">Audit trail</h2>
+        <p class="hint">
+          The ledger rows for this run, as written. This is the durable record; the
+          table above is a rendering of it.
+        </p>
+        <div class="table-scroll">
+          <table id="audit">
+            <caption class="visually-hidden">Ledger rows for this run</caption>
+            <thead>
+              <tr>
+                <th scope="col">Attempt</th>
+                <th scope="col">State</th>
+                <th scope="col">Decision</th>
+                <th scope="col">Quote</th>
+                <th scope="col">Settled</th>
+                <th scope="col">Held now</th>
+              </tr>
+            </thead>
+            <tbody id="audit-body">
+              <tr class="empty">
+                <td colspan="6">No ledger rows yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------- -->
+      <!--
+        Untrusted seller text lives in its own section, below everything we
+        produced, and is never rendered inline with our own text. A reader should
+        not have to work out which words came from a stranger.
+      -->
+      <section class="panel untrusted-panel" aria-labelledby="h-untrusted">
+        <h2 id="h-untrusted">Untrusted seller text</h2>
+        <p class="hint">
+          Quarantined data from sellers, shown exactly as the model received it. It
+          is never an instruction, and it changed no limit, budget or decision in
+          this run.
+        </p>
+        <div id="untrusted">
+          <p class="empty-note">Nothing untrusted received yet.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-foot">
+      <p>
+        Amounts are base units of the configured asset. <span class="mono">0.1%</span>
+        of a cent is not a rounding error, so nothing here is a float.
+      </p>
+    </footer>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
